@@ -126,18 +126,44 @@
             </div>
 
             <!-- Submit -->
-            <button class="submit-btn" onclick="submitForm()">Request Early Access</button>
+            <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+                <span id="btnContent">
+                    <span id="btnText">Request Early Access</span>
+                </span>
+            </button>
             <p class="form-note">Limited early slots available • 250+ businesses already on the list</p>
 
         </div>
 
         <!-- Success State -->
         <div class="success-card" id="successCard">
+          <div class="success-inner">
             <div class="success-check">✓</div>
-            <h3>You're on the list!</h3>
-            <p>Thank you for joining. We'll reach out soon — keep an eye on your inbox.</p>
+            <h3>You're on the list</h3>
+            <p>Thanks for requesting early access. We've received your details and will reach out shortly.</p>
+
+            <div class="next-steps">
+                <p class="next-label">WHAT HAPPENS NEXT</p>
+                <div class="next-item">
+                    <span class="next-num">1</span>
+                    <span>Check your email for a confirmation within 24 hours.</span>
+                </div>
+                <div class="next-item">
+                    <span class="next-num">2</span>
+                    <span>Our team will schedule a quick 15-min onboarding call.</span>
+                </div>
+                <div class="next-item">
+                    <span class="next-num">3</span>
+                    <span>Get early access credentials and start streamlining operations.</span>
+                </div>
+            </div>
+
+            <p class="contact-note">Questions? Email <a href="mailto:hello@enflow.com">hello@enflow.com</a></p>
+          </div>
         </div>
     </section>
+
     <script src="form.js"></script>
+
 </body>
 </html>
