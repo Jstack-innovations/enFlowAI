@@ -1,3 +1,9 @@
+
+AOS.init({
+  once: true,
+});
+
+
 const faqItems = document.querySelectorAll(".faq-item");
 
 faqItems.forEach((item) => {
@@ -11,3 +17,4 @@ faqItems.forEach((item) => {
     }
   });
 });
+
