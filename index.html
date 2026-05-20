@@ -1357,7 +1357,7 @@ async function fetchLaunchDate() {
         countdownTarget = new Date(Date.now() + totalSecondsLeft * 1000);
         updateCountdown(); // render immediately, don't wait 1s
         
-        const launch = new Date(data.launch_date);
+        const launch = new Date(data.launch_date.replace(' ', 'T') + '+01:00');
 const formatted = launch.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 document.getElementById('launchDateDisplay').textContent = formatted;
     } catch (err) {
