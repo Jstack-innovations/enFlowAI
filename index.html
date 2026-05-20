@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnflowAI — Early Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --ink: #1a1814;
+            --ink-soft: #2c2924;
+            --parchment: #ede9e1;
+            --cream: #e4dfd5;
+            --cream-mid: #d9d3c7;
+
+            /* Peru-adjacent warm copper tones — muted & sophisticated */
+            --copper: #a07848;
+            --copper-light: #c9a870;
+            --copper-dim: rgba(160,120,72,0.10);
+            --copper-glow: rgba(160,120,72,0.18);
+            --copper-border: rgba(160,120,72,0.28);
+
+            /* Muted warm accents */
+            --sienna: #8c5e38;
+            --sand: #c4aa82;
+            --fog: #9e9589;
+            --mist: #b8b0a4;
+
+            --border: rgba(26,24,20,0.09);
+            --border-mid: rgba(26,24,20,0.13);
+            --border-focus: rgba(160,120,72,0.45);
+
+            --radius: 10px;
+            --radius-lg: 16px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--parchment);
+            color: var(--ink);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.55;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 40px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s;
+            background: transparent;
+            border-bottom: 1px solid transparent;
+        }
+        .nav.scrolled {
+            background: rgba(245,242,236,0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom-color: var(--border);
+        }
+
+        .logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.04em;
+            color: rgba(255,255,255,0.92);
+        }
+        .logo span { color: var(--copper-light); }
+        .nav.scrolled .logo { color: var(--ink); }
+        .nav.scrolled .logo span { color: var(--copper); }
+
+        .nav-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+        }
+        .nav.scrolled .nav-badge { color: var(--fog); }
+        .nav-dot {
+            width: 6px; height: 6px;
+            background: var(--copper-light);
+            border-radius: 50%;
+            animation: pulse-dot 2.8s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.75); }
+        }
+
+        /* ── HERO VIDEO WRAPPER ── */
+        .video-wrapper {
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+        .bg-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+        .video-wrapper::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(20,16,10,0.85) 0%, rgba(14,12,8,0.78) 100%);
+            z-index: -1;
+        }
+        /* bottom fade blending video into page */
+        .video-wrapper::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 180px;
+            background: linear-gradient(to bottom, transparent 0%, #ede9e1 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            padding: 100px 24px 56px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            color: white;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--copper-light);
+            border: 1px solid rgba(160,120,72,0.30);
+            background: rgba(160,120,72,0.10);
+            padding: 8px 18px;
+            border-radius: 100px;
+            margin-bottom: 32px;
+            backdrop-filter: blur(4px);
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.4rem, 6vw, 3.8rem);
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.88);
+        }
+        .hero h1 em { font-style: italic; color: var(--copper-light); }
+
+        .hero p.subtitle {
+            font-size: 1.02rem;
+            color: rgba(255,255,255,0.48);
+            line-height: 1.8;
+            font-weight: 300;
+            max-width: 460px;
+            margin: 0 auto 36px;
+        }
+
+        /* ── SOCIAL PROOF ── */
+        .social-proof {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 48px;
+        }
+        .proof-avatars { display: flex; }
+        .proof-avatars span {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(160,120,72,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--copper-light);
+            margin-left: -8px;
+        }
+        .proof-avatars span:first-child { margin-left: 0; }
+        .proof-text {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
+        }
+        .proof-text strong { color: rgba(255,255,255,0.72); font-weight: 600; }
+
+        /* ── COUNTDOWN ── */
+        .countdown-section {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .time-box {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 14px;
+            padding: 16px 22px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            min-width: 68px;
+        }
+        .time-box h5 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.90);
+            margin: 0;
+        }
+        .time-box p {
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin: 4px 0 0;
+            font-weight: 500;
+        }
+
+        .perks {
+            display: flex;
+            gap: 22px;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.38);
+            margin: 16px 0 56px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .perks span { display: flex; align-items: center; gap: 6px; }
+        .perks i { color: var(--copper-light); opacity: 0.8; }
+
+        /* ── SERVICES ── */
+        .services {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 24px;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .service-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 18px;
+            padding: 28px 24px 24px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            flex: 1;
+            min-width: 150px;
+            max-width: 190px;
+            transition: transform 0.25s, background 0.25s, border-color 0.25s;
+        }
+        .service-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(160,120,72,0.25);
+        }
+        .service-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: rgba(160,120,72,0.15);
+            border: 1px solid rgba(160,120,72,0.22);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 1.1rem;
+            color: var(--copper-light);
+        }
+        .service-card h5 {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.72);
+            line-height: 1.5;
+        }
+
+        /* ── ABOUT ── */
+        .about-section {
+            padding: 60px 24px 80px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .section-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--copper);
+            border: 1px solid var(--copper-border);
+            background: var(--copper-dim);
+            padding: 7px 16px;
+            border-radius: 100px;
+            margin-bottom: 40px;
+        }
+        .about-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            max-width: 960px;
+            margin: 0 auto 52px;
+            flex-wrap: wrap;
+        }
+        .about-text h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.4rem, 3vw, 1.85rem);
+            font-weight: 400;
+            line-height: 1.55;
+            max-width: 380px;
+            color: #1e1b17;
+        }
+        .about-text h3 em { font-style: italic; color: var(--copper); }
+        .about-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .about-card {
+            background: #fff;
+            border: 1px solid var(--border-mid);
+            border-radius: 14px;
+            padding: 18px 22px;
+            width: 220px;
+            box-shadow: 0 2px 16px rgba(26,24,20,0.04);
+        }
+        .about-card p { font-size: 0.72rem; color: var(--fog); margin-bottom: 4px; font-weight: 400; letter-spacing: 0.02em; }
+        .about-card strong { font-size: 0.88rem; font-weight: 600; color: var(--ink-soft); }
+
+        /* ── MARQUEE ── */
+        .marquee-wrapper {
+            overflow: hidden;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: marquee 14s linear infinite;
+        }
+        .marquee-set {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+            padding-right: 48px;
+        }
+        .marquee-set span {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.1rem;
+            color: var(--copper);
+            opacity: 0.35;
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+        }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* ── FORM ── */
+        .form-section {
+            padding: 80px 24px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .form-heading {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .form-heading h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.3rem);
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: #1e1b17;
+        }
+        .form-heading h2 em { font-style: italic; color: var(--copper); }
+        .form-heading p { font-size: 0.875rem; color: var(--fog); font-weight: 300; }
+
+        .form-card {
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border: 1px solid var(--border-mid);
+            border-radius: 22px;
+            padding: 40px 38px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(26,24,20,0.03), 0 12px 48px rgba(26,24,20,0.07);
+        }
+
+        .form-divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 2px 0;
+        }
+        .form-divider-line { flex: 1; height: 1px; background: var(--border); }
+        .form-divider-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        label { font-size: 0.78rem; font-weight: 500; color: var(--ink-soft); letter-spacing: 0.01em; }
+
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid var(--border-mid);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--ink);
+            background: var(--parchment);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            resize: none;
+        }
+        input::placeholder, textarea::placeholder { color: #c8c2b8; }
+        input:focus, textarea:focus {
+            border-color: var(--copper);
+            background: #fff;
+            box-shadow: 0 0 0 3px var(--copper-dim);
+        }
+        input.error {
+            border-color: #b85050 !important;
+            box-shadow: 0 0 0 3px rgba(184,80,80,0.09) !important;
+        }
+
+        /* ── PHONE ── */
+        .phone-wrap {
+            display: flex;
+            border: 1.5px solid var(--border-mid);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--parchment);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .phone-wrap:focus-within {
+            border-color: var(--copper);
+            background: #fff;
+            box-shadow: 0 0 0 3px var(--copper-dim);
+        }
+        .phone-prefix {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 12px 14px;
+            background: var(--cream);
+            border-right: 1.5px solid var(--border-mid);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--fog);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .phone-input {
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            flex: 1;
+        }
+
+        /* ── CUSTOM SELECT ── */
+        .custom-select { position: relative; }
+        .select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border: 1.5px solid var(--border-mid);
+            border-radius: var(--radius);
+            cursor: pointer;
+            background: var(--parchment);
+            user-select: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .select-trigger:hover { border-color: var(--copper-border); }
+        .select-trigger.open {
+            border-color: var(--copper);
+            box-shadow: 0 0 0 3px var(--copper-dim);
+            background: #fff;
+        }
+        .select-trigger svg {
+            width: 15px; height: 15px;
+            color: var(--mist);
+            flex-shrink: 0;
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        .select-trigger.open svg { transform: rotate(180deg); }
+        .select-value { font-size: 0.9rem; font-weight: 300; color: #c8c2b8; font-family: 'DM Sans', sans-serif; }
+        .select-value.selected { color: var(--ink); font-weight: 400; }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0; right: 0;
+            background: var(--ink);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            z-index: 200;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.22);
+            animation: dropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .dropdown.open { display: block; }
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px 8px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+        }
+        .close-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.22);
+            transition: color 0.15s;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .close-btn:hover { color: white; background: rgba(255,255,255,0.07); }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 18px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .radio-option:hover { background: rgba(255,255,255,0.03); }
+        .radio-option span:first-child { font-size: 0.875rem; font-weight: 300; color: rgba(255,255,255,0.75); }
+        .radio-option input[type="radio"] { display: none; }
+        .radio-circle {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .radio-option input[type="radio"]:checked ~ .radio-circle {
+            border-color: var(--copper-light);
+            background: var(--copper-light);
+            box-shadow: inset 0 0 0 4px var(--ink);
+        }
+
+        /* ── TOGGLE ── */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 18px;
+            background: var(--cream);
+            border: 1px solid var(--border-mid);
+            border-radius: var(--radius);
+        }
+        .toggle-question { font-size: 0.82rem; font-weight: 400; line-height: 1.55; flex: 1; color: var(--ink-soft); }
+        .toggle-btns {
+            display: flex;
+            background: rgba(26,24,20,0.06);
+            border-radius: 100px;
+            padding: 3px;
+            flex-shrink: 0;
+        }
+        .toggle-btn {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 100px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            color: var(--fog);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .toggle-btn.active {
+            background: var(--ink);
+            color: var(--parchment);
+            box-shadow: 0 2px 8px rgba(26,24,20,0.16);
+        }
+
+        /* ── SUBMIT ── */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--ink);
+            color: var(--parchment);
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            transition: opacity 0.2s, transform 0.18s, box-shadow 0.2s;
+            margin-top: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(160,120,72,0.12) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(26,24,20,0.18);
+        }
+        .submit-btn:active { transform: translateY(0); box-shadow: none; }
+        .submit-btn:disabled { opacity: 0.55; transform: none; cursor: default; }
+
+        .form-note {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--mist);
+            font-weight: 300;
+        }
+        .form-note strong { color: var(--fog); font-weight: 500; }
+
+        /* ── SPINNER ── */
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spinner { animation: spin 0.75s linear infinite; flex-shrink: 0; }
+
+        /* ── SUCCESS MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(26,24,20,0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        .modal-overlay.open .modal-backdrop { opacity: 1; }
+        .modal-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            background: #fff;
+            border: 1px solid var(--border-mid);
+            border-radius: 24px;
+            padding: 48px 40px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 24px 80px rgba(26,24,20,0.18);
+            opacity: 0;
+            transform: translateY(24px) scale(0.97);
+            transition: opacity 0.4s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+        .modal-overlay.open .modal-card { opacity: 1; transform: translateY(0) scale(1); }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--border-mid);
+            background: var(--cream);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            color: var(--fog);
+            transition: background 0.15s, color 0.15s;
+        }
+        .modal-close:hover { background: var(--ink); color: #fff; }
+        .success-check {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: var(--copper-dim);
+            border: 1px solid var(--copper-border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+            color: var(--copper);
+            margin-bottom: 8px;
+        }
+        .modal-card h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.85rem;
+            font-weight: 400;
+            text-align: center;
+            color: var(--ink);
+        }
+        .modal-card > p {
+            font-size: 0.875rem;
+            color: var(--fog);
+            line-height: 1.75;
+            font-weight: 300;
+            max-width: 290px;
+            text-align: center;
+        }
+        .next-steps {
+            width: 100%;
+            margin-top: 14px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .next-label {
+            font-size: 0.65rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--mist) !important;
+        }
+        .next-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.855rem;
+            color: var(--ink-soft);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        .next-num {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: var(--cream);
+            border: 1px solid var(--border-mid);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            color: var(--copper);
+            margin-top: 2px;
+        }
+        .contact-note { font-size: 0.75rem !important; color: var(--mist) !important; margin-top: 6px; }
+        .contact-note a { color: var(--fog); text-decoration: underline; text-underline-offset: 2px; }
+        .modal-done-btn {
+            width: 100%;
+            margin-top: 6px;
+            padding: 14px;
+            background: var(--ink);
+            color: var(--parchment);
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: opacity 0.2s, transform 0.18s;
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-done-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(160,120,72,0.12) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        .modal-done-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+        /* ── FAQ ── */
+        .faq-section {
+            padding: 80px 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .faq-inner { max-width: 680px; margin: 0 auto; }
+        .faq-heading { text-align: center; margin-bottom: 44px; }
+        .faq-heading h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.3rem);
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: var(--ink);
+        }
+        .faq-heading p { font-size: 0.875rem; color: var(--fog); font-weight: 300; }
+        .faq-list { display: flex; flex-direction: column; gap: 10px; }
+        .faq-item {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .faq-item:hover { border-color: var(--copper-border); }
+        .faq-item.open { border-color: var(--copper-border); }
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 20px 22px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-align: left;
+            color: var(--ink);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        .faq-icon {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--ink);
+            color: var(--copper-light);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.2s;
+        }
+        .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--copper); color: var(--ink); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+        .faq-answer p {
+            padding: 0 22px 20px;
+            font-size: 0.875rem;
+            color: var(--fog);
+            line-height: 1.78;
+            font-weight: 300;
+        }
+        .faq-item.open .faq-answer { max-height: 240px; }
+
+        /* ── CTA ── */
+        .cta-section {
+            padding: 0 24px 100px;
+            position: relative;
+            z-index: 1;
+        }
+        .cta-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            background: var(--ink);
+            border-radius: 24px;
+            padding: 68px 52px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-inner::before {
+            content: '';
+            position: absolute;
+            top: -70px; right: -70px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(160,120,72,0.10) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .cta-inner::after {
+            content: '';
+            position: absolute;
+            bottom: -50px; left: -50px;
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(160,120,72,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .cta-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.22);
+            letter-spacing: 0.1em;
+            margin-bottom: 24px;
+        }
+        .cta-logo span { color: var(--copper-light); opacity: 0.7; }
+        .cta-inner h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.75rem, 4vw, 2.3rem);
+            font-weight: 400;
+            color: rgba(255,255,255,0.90);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        .cta-inner p {
+            font-size: 0.92rem;
+            color: rgba(255,255,255,0.38);
+            font-weight: 300;
+            max-width: 360px;
+            margin: 0 auto 36px;
+            line-height: 1.75;
+        }
+        .cta-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .cta-btn-primary {
+            padding: 14px 28px;
+            background: var(--copper);
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+            text-decoration: none;
+        }
+        .cta-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(160,120,72,0.28);
+            opacity: 0.92;
+        }
+        .cta-btn-secondary {
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.65);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 100px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 400;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: background 0.18s, border-color 0.18s, transform 0.18s;
+            text-decoration: none;
+        }
+        .cta-btn-secondary:hover {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(255,255,255,0.18);
+            transform: translateY(-2px);
+        }
+
+        /* ── ENTRY ANIMATIONS ── */
+        .hero-eyebrow, .hero h1, .hero p.subtitle, .social-proof,
+        .countdown-section, .perks {
+            opacity: 0;
+            transform: translateY(14px);
+            animation: fadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .hero-eyebrow    { animation-delay: 0.08s; }
+        .hero h1         { animation-delay: 0.18s; }
+        .hero p.subtitle { animation-delay: 0.26s; }
+        .social-proof    { animation-delay: 0.34s; }
+        .countdown-section { animation-delay: 0.42s; }
+        .perks           { animation-delay: 0.50s; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .nav { padding: 18px 22px; }
+            .hero { padding: 72px 20px 40px; }
+            .form-card { padding: 26px 20px; border-radius: 16px; }
+            .field-row { grid-template-columns: 1fr; }
+            .toggle-row { flex-direction: column; align-items: flex-start; }
+            .about-inner { flex-direction: column; gap: 28px; }
+            .about-cards { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            .about-card { width: calc(50% - 5px); min-width: 130px; }
+            .cta-inner { padding: 44px 24px; border-radius: 18px; }
+            .countdown-section { gap: 8px; }
+            .time-box { padding: 12px 14px; min-width: 56px; }
+            .modal-card { padding: 36px 22px 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <div class="logo">Enflow<span>AI</span></div>
+        <div class="nav-badge">
+            <span class="nav-dot"></span>
+            Early Access Open
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="video-wrapper">
+        <video autoplay muted loop playsinline class="bg-video">
+            <source src="Video/Hero.mp4" type="video/mp4">
+        </video>
+
+        <section class="hero">
+            <div class="hero-eyebrow"><i class="fa-solid fa-microchip"></i> AI Revolution for Food Businesses</div>
+            <h1>Transform your restaurant<br>with <em>Intelligent</em> AI</h1>
+            <p class="subtitle">Join the early access list. Limited slots for restaurants, cafés & lounges ready to automate, optimise, and scale effortlessly.</p>
+            <div class="social-proof">
+                <div class="proof-avatars">
+                    <span>K</span><span>A</span><span>T</span><span>F</span>
+                </div>
+<p class="proof-text"><strong>Be among the first</strong> to get early access</p>
+            </div>
+        </section>
+
+        <!-- COUNTDOWN -->
+        <div class="countdown-section">
+            <div class="time-box"><h5 id="days">--</h5><p>Days</p></div>
+            <div class="time-box"><h5 id="hours">--</h5><p>Hours</p></div>
+            <div class="time-box"><h5 id="mins">--</h5><p>Minutes</p></div>
+            <div class="time-box"><h5 id="secs">--</h5><p>Seconds</p></div>
+        </div>
+        <div class="perks">
+            <span><i class="fa-regular fa-circle-check"></i> No credit card required</span>
+            <span><i class="fa-regular fa-circle-check"></i> Cancel anytime</span>
+            <span><i class="fa-regular fa-circle-check"></i> 10-day free trial included</span>
+        </div>
+
+        <!-- SERVICES -->
+        <div class="services">
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-brain"></i></div>
+                <h5>Smart<br>Automation</h5>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <h5>Real-Time<br>Insights</h5>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-plug"></i></div>
+                <h5>Universal<br>Integration</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section class="about-section">
+        <div style="text-align:center; margin-bottom:40px;">
+            <div class="section-pill"><i class="fa-solid fa-rocket"></i> About EnflowAI</div>
+        </div>
+        <div class="about-inner">
+            <div class="about-text">
+                <h3><em>EnflowAI</em> empowers food businesses to achieve more with less effort. Our adaptive intelligence learns your workflow, anticipates your needs, and delivers results that matter.</h3>
+            </div>
+            <div class="about-cards">
+                <div class="about-card">
+                    <p>Launch Timeline</p>
+                    <strong>Q3 2026 · July Launch</strong>
+                </div>
+                <div class="about-card">
+                    <p>Core Technology</p>
+                    <strong>Neural ML + GPT-5</strong>
+                </div>
+                <div class="about-card">
+                    <p>Early Access Perk</p>
+                    <strong>10-Day Free Trial</strong>
+                </div>
+            </div>
+        </div>
+        <div class="marquee-wrapper">
+            <div class="marquee-track">
+                <div class="marquee-set">
+                    <span>EnflowAI</span><span>Smart Orders</span><span>Inventory AI</span><span>Staff Sync</span><span>Menu Intelligence</span>
+                </div>
+                <div class="marquee-set">
+                    <span>EnflowAI</span><span>Smart Orders</span><span>Inventory AI</span><span>Staff Sync</span><span>Menu Intelligence</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORM SECTION -->
+    <section class="form-section" id="form">
+        <div class="form-heading">
+            <div class="section-pill" style="margin-bottom:20px;"><i class="fa-solid fa-pen-to-square"></i> Join the Waitlist</div>
+            <h2>Claim your <em>early access</em> spot</h2>
+            <p>Fill in your details below — we'll be in touch within 24 hours.</p>
+        </div>
+
+        <div class="form-card" id="formCard">
+            <div class="form-divider">
+                <div class="form-divider-line"></div>
+                <div class="form-divider-label">Your Details</div>
+                <div class="form-divider-line"></div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Full Name</label>
+                    <input type="text" placeholder="Kendrell Powells" id="fullName" />
+                </div>
+                <div class="field">
+                    <label>Business Name</label>
+                    <input type="text" placeholder="ccJitters" id="businessName" />
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Business Type</label>
+                    <div class="custom-select">
+                        <div class="select-trigger" onclick="toggleDropdown('typeDropdown', this)">
+                            <span class="select-value" id="typeValue">Select type</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                        <div class="dropdown" id="typeDropdown">
+                            <div class="dropdown-header">Type <span class="close-btn" onclick="closeDropdown('typeDropdown')"><i class="fa-solid fa-xmark"></i></span></div>
+                            <label class="radio-option"><span>Restaurant</span><input type="radio" name="businessType" value="Restaurant" onchange="selectOption('typeValue','Restaurant','typeDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Lounge</span><input type="radio" name="businessType" value="Lounge" onchange="selectOption('typeValue','Lounge','typeDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Café</span><input type="radio" name="businessType" value="Café" onchange="selectOption('typeValue','Café','typeDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Cloud Kitchen</span><input type="radio" name="businessType" value="Cloud Kitchen" onchange="selectOption('typeValue','Cloud Kitchen','typeDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Other</span><input type="radio" name="businessType" value="Other" onchange="selectOption('typeValue','Other','typeDropdown')"><span class="radio-circle"></span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>City</label>
+                    <div class="custom-select">
+                        <div class="select-trigger" onclick="toggleDropdown('cityDropdown', this)">
+                            <span class="select-value" id="cityValue">Select city</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                        <div class="dropdown" id="cityDropdown">
+                            <div class="dropdown-header">City <span class="close-btn" onclick="closeDropdown('cityDropdown')"><i class="fa-solid fa-xmark"></i></span></div>
+                            <label class="radio-option"><span>Lagos</span><input type="radio" name="city" value="Lagos" onchange="selectOption('cityValue','Lagos','cityDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Abuja</span><input type="radio" name="city" value="Abuja" onchange="selectOption('cityValue','Abuja','cityDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Port Harcourt</span><input type="radio" name="city" value="Port Harcourt" onchange="selectOption('cityValue','Port Harcourt','cityDropdown')"><span class="radio-circle"></span></label>
+                            <label class="radio-option"><span>Other</span><input type="radio" name="city" value="Other" onchange="selectOption('cityValue','Other','cityDropdown')"><span class="radio-circle"></span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Phone Number</label>
+                <div class="phone-wrap">
+                    <div class="phone-prefix">
+                        <i class="fa-solid fa-flag" style="color:var(--copper);font-size:0.8rem;"></i>
+                        <span>+234</span>
+                    </div>
+                    <input type="tel" placeholder="800 000 0000" id="phone" class="phone-input" />
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Email Address</label>
+                <input type="email" placeholder="powells@ccJitters.com" id="email" />
+            </div>
+
+            <div class="form-divider" style="margin-top:2px;">
+                <div class="form-divider-line"></div>
+                <div class="form-divider-label">About Your Business</div>
+                <div class="form-divider-line"></div>
+            </div>
+
+            <div class="field">
+                <label>Biggest current challenge</label>
+                <textarea placeholder="e.g. Managing orders during rush hours, inventory tracking, staff coordination…" id="challenge" rows="3"></textarea>
+            </div>
+
+            <div class="field">
+                <label>Monthly customer volume</label>
+                <div class="custom-select">
+                    <div class="select-trigger" onclick="toggleDropdown('volumeDropdown', this)">
+                        <span class="select-value" id="volumeValue">Select range</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    <div class="dropdown" id="volumeDropdown">
+                        <div class="dropdown-header">Volume <span class="close-btn" onclick="closeDropdown('volumeDropdown')"><i class="fa-solid fa-xmark"></i></span></div>
+                        <label class="radio-option"><span>0 – 100</span><input type="radio" name="volume" value="0-100" onchange="selectOption('volumeValue','0–100','volumeDropdown')"><span class="radio-circle"></span></label>
+                        <label class="radio-option"><span>100 – 500</span><input type="radio" name="volume" value="100-500" onchange="selectOption('volumeValue','100–500','volumeDropdown')"><span class="radio-circle"></span></label>
+                        <label class="radio-option"><span>500+</span><input type="radio" name="volume" value="500+" onchange="selectOption('volumeValue','500+','volumeDropdown')"><span class="radio-circle"></span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="toggle-row">
+                    <span class="toggle-question">Ready to adopt new software within 30 days?</span>
+                    <div class="toggle-btns">
+                        <button class="toggle-btn active" id="yesBtn" onclick="setToggle('yes')">Yes</button>
+                        <button class="toggle-btn" id="noBtn" onclick="setToggle('no')">No</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+                <span id="btnContent"><i class="fa-solid fa-arrow-right" style="margin-right:8px;"></i>Request Early Access</span>
+            </button>
+            <p class="form-note">Early access includes a <strong>10-day free trial</strong> · No fee required</p>
+        </div>
+    </section>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="success-check"><i class="fa-solid fa-check"></i></div>
+            <h3>You're on the list</h3>
+            <p>Thanks for requesting early access. We'll be in touch shortly.</p>
+            <div class="next-steps">
+                <p class="next-label">What happens next</p>
+                <div class="next-item">
+                    <span class="next-num">1</span>
+                    <span>Check your email for a confirmation within 24 hours.</span>
+                </div>
+                <div class="next-item">
+                    <span class="next-num">2</span>
+                    <span>Our team will schedule a quick 15-min onboarding call.</span>
+                </div>
+                <div class="next-item">
+                    <span class="next-num">3</span>
+                    <span>Get early access credentials and start streamlining.</span>
+                </div>
+            </div>
+            <p class="contact-note">Questions? <a href="mailto:hello@enflowai.com">hello@enflowai.com</a></p>
+            <button class="modal-done-btn" onclick="closeModal()">Done</button>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <div class="faq-inner">
+            <div class="faq-heading">
+                <div class="section-pill" style="margin-bottom:16px;"><i class="fa-regular fa-circle-question"></i> F.A.Q.</div>
+                <h2>Common Questions</h2>
+                <p>Everything you need to know before joining.</p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What's included in early access?</span>
+                        <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+                    </button>
+                    <div class="faq-answer"><p>Early access members get full platform access, priority support, exclusive feature previews, and a 10-day free trial. You'll also join our private community where you can directly influence product development and network with other innovative food businesses.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What kind of businesses is EnflowAI built for?</span>
+                        <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+                    </button>
+                    <div class="faq-answer"><p>EnflowAI is purpose-built for Nigeria's food businesses — restaurants, cafés, lounges, and cloud kitchens. Whether you serve 50 customers a day or 5,000, our AI adapts to your scale and workflow.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Is there any commitment to join the waitlist?</span>
+                        <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+                    </button>
+                    <div class="faq-answer"><p>Absolutely none. Joining the waitlist is 100% free with zero commitment. You can leave anytime. We'll only contact you with important updates about the launch — no spam, no pressure, no sales calls.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How quickly can I get started after approval?</span>
+                        <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+                    </button>
+                    <div class="faq-answer"><p>Once approved, you'll receive your access credentials within 24 hours. Our onboarding team will schedule a 15-minute setup call and have you running within the same day. Most businesses see their first AI-powered insights within 48 hours.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-inner">
+            <div class="cta-logo">Enflow<span>AI</span></div>
+            <h2>Ready to join the waitlist?</h2>
+            <p>Join 4,892 food businesses already on the list. Be part of the AI revolution in Nigeria's food industry.</p>
+            <div class="cta-btns">
+                <a href="#form" class="cta-btn-primary"><i class="fa-solid fa-arrow-right" style="margin-right:8px;"></i>Join Waitlist</a>
+                <a href="mailto:hello@enflowai.com" class="cta-btn-secondary">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ── COUNTDOWN ──
+let countdownTarget = null;
+
+async function fetchLaunchDate() {
+    try {
+        const res  = await fetch("http://localhost:8080/htdocs/enflowApi/countdown.php");
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        // Build a target Date from the server's remaining seconds
+        const totalSecondsLeft =
+            data.remaining.days    * 86400 +
+            data.remaining.hours   * 3600  +
+            data.remaining.minutes * 60    +
+            data.remaining.seconds;
+
+        countdownTarget = new Date(Date.now() + totalSecondsLeft * 1000);
+        updateCountdown(); // render immediately, don't wait 1s
+    } catch (err) {
+        console.error("Countdown fetch failed:", err);
+        // Fallback: hardcoded July 1 2026 WAT (UTC+1)
+        countdownTarget = new Date("2026-07-01T00:00:00+01:00");
+        updateCountdown();
+    }
+}
+
+function updateCountdown() {
+    if (!countdownTarget) return;
+
+    const diff = Math.max(0, countdownTarget - Date.now());
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+
+    document.getElementById('days').textContent  = String(d).padStart(2, '0');
+    document.getElementById('hours').textContent = String(h).padStart(2, '0');
+    document.getElementById('mins').textContent  = String(m).padStart(2, '0');
+    document.getElementById('secs').textContent  = String(s).padStart(2, '0');
+}
+
+fetchLaunchDate();
+setInterval(updateCountdown, 1000);
+
+        // ── DROPDOWNS ──
+        let readyToAdopt = 'yes';
+
+        function toggleDropdown(id, trigger) {
+            const isOpen = document.getElementById(id).classList.contains('open');
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+            document.querySelectorAll('.select-trigger').forEach(t => t.classList.remove('open'));
+            if (!isOpen) {
+                document.getElementById(id).classList.add('open');
+                trigger.classList.add('open');
+            }
+        }
+        function closeDropdown(id) {
+            document.getElementById(id).classList.remove('open');
+            const trigger = document.getElementById(id).previousElementSibling;
+            if (trigger) trigger.classList.remove('open');
+        }
+        function selectOption(valueId, value, dropdownId) {
+            document.getElementById(valueId).textContent = value;
+            document.getElementById(valueId).classList.add('selected');
+            setTimeout(() => closeDropdown(dropdownId), 160);
+        }
+        function setToggle(val) {
+            readyToAdopt = val;
+            document.getElementById('yesBtn').classList.toggle('active', val === 'yes');
+            document.getElementById('noBtn').classList.toggle('active', val === 'no');
+        }
+
+        // ── FAQ ──
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.faq-item');
+                const isOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!isOpen) item.classList.add('open');
+            });
+        });
+
+        // ── FORM SUBMIT ──
+        async function submitForm() {
+            const required = ['fullName', 'businessName', 'phone', 'email'];
+            let hasError = false;
+            for (let id of required) {
+                const input = document.getElementById(id);
+                if (!input.value.trim()) {
+                    input.classList.add('error');
+                    if (!hasError) { input.focus(); hasError = true; }
+                    setTimeout(() => input.classList.remove('error'), 2200);
+                }
+            }
+            if (hasError) return;
+
+            const data = {
+                fullName: document.getElementById('fullName').value.trim(),
+                businessName: document.getElementById('businessName').value.trim(),
+                businessType: document.getElementById('typeValue').textContent,
+                city: document.getElementById('cityValue').textContent,
+                phone: "+234" + document.getElementById('phone').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                challenge: document.getElementById('challenge').value.trim(),
+                volume: document.getElementById('volumeValue').textContent,
+                readyToAdopt
+            };
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            document.getElementById('btnContent').innerHTML = `
+                <span style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                    <svg class="spinner" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                    Submitting…
+                </span>`;
+
+            try {
+                const response = await fetch("http://localhost:8080/htdocs/enflowApi/waitlist.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showSuccess();
+                } else {
+                    alert("Something went wrong. Please try again.");
+                    btn.disabled = false;
+                    document.getElementById('btnContent').innerHTML = '<i class="fa-solid fa-arrow-right" style="margin-right:8px;"></i>Request Early Access';
+                }
+            } catch (error) {
+                showSuccess();
+                console.error(error);
+            }
+        }
+
+        function showSuccess() {
+            const modal = document.getElementById('successModal');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('formCard').querySelectorAll('input, textarea').forEach(el => el.value = '');
+            document.getElementById('typeValue').textContent = 'Select type';
+            document.getElementById('typeValue').classList.remove('selected');
+            document.getElementById('cityValue').textContent = 'Select city';
+            document.getElementById('cityValue').classList.remove('selected');
+            document.getElementById('volumeValue').textContent = 'Select range';
+            document.getElementById('volumeValue').classList.remove('selected');
+            setToggle('yes');
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            document.getElementById('btnContent').innerHTML = '<i class="fa-solid fa-arrow-right" style="margin-right:8px;"></i>Request Early Access';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-select')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+                document.querySelectorAll('.select-trigger').forEach(t => t.classList.remove('open'));
+            }
+        });
+
+        window.addEventListener("scroll", function () {
+            const nav = document.querySelector(".nav");
+            nav.classList.toggle("scrolled", window.scrollY > 50);
+        });
+    </script>
+</body>
+</html>
