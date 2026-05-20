@@ -1108,7 +1108,7 @@
             <div class="about-cards">
                 <div class="about-card">
                     <p>Launch Timeline</p>
-                    <strong>Q3 2026 · July Launch</strong>
+                    <strong id="launchDateDisplay">Q3 2026 · July Launch</strong>
                 </div>
                 <div class="about-card">
                     <p>Core Technology</p>
@@ -1356,6 +1356,10 @@ async function fetchLaunchDate() {
 
         countdownTarget = new Date(Date.now() + totalSecondsLeft * 1000);
         updateCountdown(); // render immediately, don't wait 1s
+        
+        const launch = new Date(data.launch_date);
+const formatted = launch.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+document.getElementById('launchDateDisplay').textContent = formatted;
     } catch (err) {
         console.error("Countdown fetch failed:", err);
         // Fallback: hardcoded July 1 2026 WAT (UTC+1)
