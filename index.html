@@ -1343,7 +1343,8 @@ let countdownTarget = null;
 
 async function fetchLaunchDate() {
     try {
-        const res  = await fetch("https://api-enflowai.onrender.com/countdown.php");
+       // const res  = await fetch("https://api-enflowai.onrender.com/countdown.php");
+        const res  = await fetch("https://apienflowai-production.up.railway.app/countdown.php");
         const data = await res.json();
 
         if (!data.success) throw new Error(data.error);
@@ -1462,7 +1463,8 @@ setInterval(updateCountdown, 1000);
                 </span>`;
 
             try {
-                const response = await fetch("https://api-enflowai.onrender.com/waitlist.php", {
+                //const response = await fetch("https://api-enflowai.onrender.com/waitlist.php", {
+                const response = await fetch("https://apienflowai-production.up.railway.app/waitlist.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data)
